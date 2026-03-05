@@ -1,0 +1,236 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+
+// Components
+import Navbar from './components/Navbar';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import OAuthCallback from './components/Auth/OAuthCallback';
+import Dashboard from './components/Dashboard/Dashboard';
+import UserDashboard from './components/Dashboard/UserDashboard';
+import AdminPanel from './components/Admin/AdminPanel';
+import Products from './components/Products/Products';
+import DiscountProducts from './components/Products/DiscountProducts';
+import ITProducts from './components/Products/ITProducts';
+import Cart from './components/Cart/Cart';
+import Orders from './components/Orders/Orders';
+import OrderTrackingPage from './components/Orders/OrderTrackingPage';
+import Profile from './components/Profile/Profile';
+import RoleGuide from './components/RoleGuide/RoleGuide';
+import PaymentCheckout from './components/Payment/PaymentCheckout';
+import Footer from './components/Footer';
+import Contact from './components/Contect/Contect';
+import ProductDetail from './components/Products/ProductDetail';
+import SellerOnboarding from './components/Seller/SellerOnboarding';
+import StoreList from './components/Seller/StoreList';
+import StoreDetail from './components/Seller/StoreDetail';
+import SellerPanel from './components/Seller/SellerPanel';
+import ScrollToTop from './components/Common/ScrollToTop';
+import NewProductNotifications from './components/Notifications/NewProductNotifications';
+// Context
+import { AuthProvider, useAuth } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
+import { NotificationProvider } from './context/NotificationContext';
+import HelpPageShopeeStyle from './components/Help/help';
+import RiderDashboard from './components/Rider/RiderDashboard';
+import ReturnsPage from './components/Orders/ReturnsPage';
+
+// Protected Route Component
+const ProtectedRoute = ({ children, adminOnly = false, riderOnly = false }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (adminOnly && user.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  if (riderOnly && user.role !== 'courier') {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return children;
+};
+
+const AppContent = () => {
+  const location = useLocation();
+  // หน้า admin และ seller center ไม่แสดง Navbar และใช้ layout พิเศษ
+  const isAdminOrSellerPage = location.pathname.startsWith('/admin') || location.pathname.startsWith('/seller/dashboard') || location.pathname.startsWith('/seller/orders') || location.pathname.startsWith('/seller/products');
+  
+  return (
+    <div className={isAdminOrSellerPage ? '' : 'min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50'}>
+      <ScrollToTop />
+      <Navbar />
+      <main className={isAdminOrSellerPage ? '' : 'pt-16'}>
+        <Routes>
+          <Route 
+            path="/" 
+            element={<UserDashboard user={null} stats={{}} loading={false} />} 
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
+          
+          {/* Public Routes */}
+          <Route path="/products" element={<Products />} />
+          <Route path="/discount-products" element={<DiscountProducts />} />
+          <Route path="/it-products" element={<ITProducts />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/help" element={<HelpPageShopeeStyle />} />
+          <Route path="/notifications" element={<NewProductNotifications />} />
+          {/* Protected Routes */}
+          <Route path="/stores" element={<StoreList />} />
+          <Route path="/store/:id" element={<StoreDetail />} />
+          <Route 
+            path="/become-seller" 
+            element={
+              <ProtectedRoute>
+                <SellerOnboarding />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/seller" 
+            element={
+              <ProtectedRoute>
+                <SellerOnboarding />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/seller/dashboard" 
+            element={
+              <ProtectedRoute>
+                <SellerPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/seller/products/*" 
+            element={
+              <ProtectedRoute>
+                <SellerPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/seller/orders/*" 
+            element={
+              <ProtectedRoute>
+                <SellerPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route path="/cart" element={<Cart />} />
+          
+          <Route 
+            path="/orders" 
+            element={
+              <ProtectedRoute>
+                <Orders />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/orders/:id" 
+            element={
+              <ProtectedRoute>
+                <OrderTrackingPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/returns" 
+            element={
+              <ProtectedRoute>
+                <ReturnsPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute adminOnly={true}>
+                <AdminPanel />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/roles" 
+            element={
+              <ProtectedRoute>
+                <RoleGuide />
+              </ProtectedRoute>
+            } 
+          />
+          <Route path="/rider" element={<Navigate to="/rider/dashboard" replace />} />
+          <Route 
+            path="/rider/dashboard" 
+            element={
+              <ProtectedRoute riderOnly={true}>
+                <RiderDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/payment/:orderId" 
+            element={
+              <ProtectedRoute>
+                <PaymentCheckout />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </main>
+      {!isAdminOrSellerPage && <Footer />}
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <Router future={{ v7_relativeSplatPath: true }}>
+      <NotificationProvider>
+        <AuthProvider>
+          <CartProvider>
+            <AppContent />
+          </CartProvider>
+        </AuthProvider>
+      </NotificationProvider>
+    </Router>
+  );
+}
+
+export default App;
