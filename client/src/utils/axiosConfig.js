@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { authStorage } from './authStorage';
 
-// สร้าง axios instance ที่สามารถกำหนด baseURL ได้
+// โปรเจกต์นี้ใช้ Create React App → ใช้ REACT_APP_ (ถ้าเป็น Vite ต้องใช้ VITE_ และ import.meta.env.VITE_API_URL)
 const apiClient = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '', // ถ้าไม่ตั้งค่า จะใช้ relative path (proxy)
-  withCredentials: true,
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+  withCredentials: true, // ส่ง Cookie/Session ได้
   headers: {
     'Content-Type': 'application/json',
   },
