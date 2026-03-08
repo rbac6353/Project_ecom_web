@@ -20,10 +20,13 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // สำหรับ parse FormData
 
-// CORS configuration
+// CORS: ถ้าตั้ง CLIENT_URL บน Render ให้ใส่ URL ของ Vercel (เช่น https://your-app.vercel.app)
+// ถ้าไม่ตั้ง จะยอมรับทุก origin ใน production เพื่อไม่ให้โดน CORS เมื่อลืมตั้ง
 const allowedOrigins = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.split(',').map(url => url.trim())
-  : ['http://localhost:3001', 'http://localhost:3000', 'http://localhost:3002'];
+  ? process.env.CLIENT_URL.split(',').map(url => url.trim()).filter(Boolean)
+  : (process.env.NODE_ENV === 'production'
+      ? true  // production แต่ไม่มี CLIENT_URL → สะท้อน request origin (ยอมรับ Vercel ได้)
+      : ['http://localhost:3001', 'http://localhost:3000', 'http://localhost:3002']);
 
 app.use(cors({
   origin: allowedOrigins,
