@@ -3,14 +3,20 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const prisma = require('./prisma');
 
-// Google OAuth Strategy
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    },
+// เฉพาะเมื่อมี env ครบเท่านั้น จึงลงทะเบียน Google (กัน error บน Render เมื่อลืมตั้งหรือชื่อตัวแปรผิด)
+const hasGoogleEnv =
+  process.env.GOOGLE_CLIENT_ID?.trim() &&
+  process.env.GOOGLE_CLIENT_SECRET?.trim() &&
+  process.env.GOOGLE_CALLBACK_URL?.trim();
+
+if (hasGoogleEnv) {
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID.trim(),
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET.trim(),
+        callbackURL: process.env.GOOGLE_CALLBACK_URL.trim(),
+      },
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails?.[0]?.value;
@@ -58,17 +64,26 @@ passport.use(
       }
     }
   )
-);
+  );
+} else if (process.env.NODE_ENV === 'production') {
+  console.warn('Passport: GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_CALLBACK_URL ไม่ครบ หรือมีเว้นวรรคในชื่อตัวแปร — Google Login จะไม่ทำงาน');
+}
 
-// Facebook OAuth Strategy
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: process.env.FACEBOOK_APP_ID || 'your-facebook-app-id',
-      clientSecret: process.env.FACEBOOK_APP_SECRET || 'your-facebook-app-secret',
-      callbackURL: process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:3000/api/auth/facebook/callback',
-      profileFields: ['id', 'displayName', 'photos', 'email'],
-    },
+// Facebook OAuth Strategy (ลงทะเบียนเมื่อมี env ครบ)
+const hasFbEnv =
+  process.env.FACEBOOK_APP_ID?.trim() &&
+  process.env.FACEBOOK_APP_SECRET?.trim() &&
+  process.env.FACEBOOK_CALLBACK_URL?.trim();
+
+if (hasFbEnv) {
+  passport.use(
+    new FacebookStrategy(
+      {
+        clientID: process.env.FACEBOOK_APP_ID.trim(),
+        clientSecret: process.env.FACEBOOK_APP_SECRET.trim(),
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL.trim(),
+        profileFields: ['id', 'displayName', 'photos', 'email'],
+      },
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
@@ -111,7 +126,10 @@ passport.use(
       }
     }
   )
-);
+  );
+} else if (process.env.NODE_ENV === 'production') {
+  console.warn('Passport: FACEBOOK_APP_ID / FACEBOOK_APP_SECRET / FACEBOOK_CALLBACK_URL ไม่ครบ — Facebook Login จะไม่ทำงาน');
+}
 
 // Serialize user for session
 passport.serializeUser((user, done) => {
