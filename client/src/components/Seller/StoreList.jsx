@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 
 const StoreList = () => {
@@ -10,7 +10,7 @@ const StoreList = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await axios.get('/api/stores');
+        const { data } = await apiClient.get('/api/stores');
         setStores(data.stores || []);
       } finally {
         setLoading(false);

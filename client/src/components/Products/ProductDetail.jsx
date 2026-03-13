@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
@@ -39,8 +39,8 @@ const ProductDetail = () => {
       setLoading(true);
 
       const [productResponse, relatedResponse] = await Promise.all([
-        axios.get(`/api/product/${id}`),
-        axios.get('/api/products/100')
+        apiClient.get(`/api/product/${id}`),
+        apiClient.get('/api/products/100')
       ]);
 
       const currentProduct = productResponse.data.product;
@@ -130,7 +130,7 @@ const ProductDetail = () => {
 
   const handlePrevProduct = useCallback(async () => {
     try {
-      const response = await axios.get('/api/products/100');
+      const response = await apiClient.get('/api/products/100');
       const allProducts = response.data.products || [];
 
       const currentIndex = allProducts.findIndex(p => p.id === parseInt(id));
@@ -147,7 +147,7 @@ const ProductDetail = () => {
 
   const handleNextProduct = useCallback(async () => {
     try {
-      const response = await axios.get('/api/products/100');
+      const response = await apiClient.get('/api/products/100');
       const allProducts = response.data.products || [];
 
       const currentIndex = allProducts.findIndex(p => p.id === parseInt(id));
@@ -254,7 +254,7 @@ const ProductDetail = () => {
     setAiLoading(true);
     setAiAnswer('');
     try {
-      const { data } = await axios.post(`/api/ai/product-question/${product.id}`, {
+      const { data } = await apiClient.post(`/api/ai/product-question/${product.id}`, {
         question: q,
         provider: aiProvider,
       });

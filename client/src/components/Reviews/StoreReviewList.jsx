@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
@@ -23,7 +23,7 @@ const StoreReviewList = ({ storeId, storeOwnerId }) => {
       }
       try {
         setLoading(true);
-        const res = await axios.get(`/api/review/store/${storeId}`);
+        const res = await apiClient.get(`/api/review/store/${storeId}`);
         if (!cancelled) {
           const reviews = res.data.reviews || [];
           setReviews(reviews);
@@ -67,7 +67,7 @@ const StoreReviewList = ({ storeId, storeOwnerId }) => {
     try {
       setDeletingReviews(prev => new Set(prev).add(reviewId));
       const token = authStorage.getToken();
-      await axios.delete(`/api/review/${reviewId}`, {
+      await apiClient.delete(`/api/review/${reviewId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

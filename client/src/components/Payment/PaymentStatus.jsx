@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 import { authStorage } from '../../utils/authStorage';
 
@@ -12,7 +12,7 @@ const PaymentStatus = ({ payment, onBack, onRetry }) => {
     try {
       setLoading(true);
       const token = authStorage.getToken();
-      const response = await axios.get(`/api/payment/${payment.id}/promptpay`, {
+      const response = await apiClient.get(`/api/payment/${payment.id}/promptpay`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setQrData(response.data.promptPay);

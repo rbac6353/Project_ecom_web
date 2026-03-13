@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { authStorage } from '../../utils/authStorage';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 
 const Profile = () => {
@@ -60,7 +60,7 @@ const Profile = () => {
       setLoadingWallet(true);
       const token = authStorage.getToken();
       if (!token) return;
-      const { data } = await axios.get('/api/user/wallet', {
+      const { data } = await apiClient.get('/api/user/wallet', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWallet(data.wallet || null);
@@ -80,7 +80,7 @@ const Profile = () => {
         toast.error('กรุณาเข้าสู่ระบบก่อน');
         return;
       }
-      const response = await axios.get('/api/coupon/my-coupons', {
+      const response = await apiClient.get('/api/coupon/my-coupons', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUserCoupons(response.data.coupons || []);
@@ -124,7 +124,7 @@ const Profile = () => {
         toast.error('กรุณาเข้าสู่ระบบก่อน');
         return;
       }
-      const response = await axios.post('/api/coupon/create-test', {}, {
+      const response = await apiClient.post('/api/coupon/create-test', {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -163,7 +163,7 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('profilePicture', file);
 
-      const response = await axios.post('/api/user/upload-profile-picture', formData, {
+      const response = await apiClient.post('/api/user/upload-profile-picture', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -247,7 +247,7 @@ const Profile = () => {
     try {
       const token = authStorage.getToken();
 
-      const response = await axios.post('/api/user/update-profile', {
+      const response = await apiClient.post('/api/user/update-profile', {
         name: profileData.name.trim(),
         email: profileData.email.trim(),
         picture: profileData.profilePicture
@@ -292,7 +292,7 @@ const Profile = () => {
     try {
       const token = authStorage.getToken();
 
-      const response = await axios.post('/api/user/update-profile', {
+      const response = await apiClient.post('/api/user/update-profile', {
         name: user?.name || '',
         address: addressData.address.trim(),
         phone: addressData.phone.trim(),
@@ -348,7 +348,7 @@ const Profile = () => {
     try {
       const token = authStorage.getToken();
 
-      const response = await axios.post('/api/user/change-password', {
+      const response = await apiClient.post('/api/user/change-password', {
         currentPassword: passwordData.currentPassword.trim(),
         newPassword: passwordData.newPassword.trim()
       }, {

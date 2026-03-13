@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 
@@ -16,7 +16,7 @@ const Notifications = () => {
     try {
       setLoading(true);
       const token = authStorage.getToken();
-      const response = await axios.get('/api/notifications', {
+      const response = await apiClient.get('/api/notifications', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -33,7 +33,7 @@ const Notifications = () => {
   const markAsRead = async (notificationId) => {
     try {
       const token = authStorage.getToken();
-      await axios.put(`/api/notifications/${notificationId}/read`, {}, {
+      await apiClient.put(`/api/notifications/${notificationId}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -50,7 +50,7 @@ const Notifications = () => {
   const markAllAsRead = async () => {
     try {
       const token = authStorage.getToken();
-      await axios.put('/api/notifications/read-all', {}, {
+      await apiClient.put('/api/notifications/read-all', {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

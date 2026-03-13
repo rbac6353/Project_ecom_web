@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from '../../utils/axiosConfig';
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
@@ -22,7 +22,7 @@ const BannerManagement = () => {
   const loadBanners = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('/api/config/banners');
+      const { data } = await apiClient.get('/api/config/banners');
       setBanners(data);
     } catch (error) {
       console.error("Error loading banners:", error);
@@ -74,7 +74,7 @@ const BannerManagement = () => {
             uploadData.append('image', formData.image);
             
             try {
-                const uploadRes = await axios.post('/api/images', uploadData, {
+                const uploadRes = await apiClient.post('/api/images', uploadData, {
                     headers: { 'Authorization': `Bearer ${user.token}` } // Cleaned up header
                 });
                 
@@ -105,12 +105,12 @@ const BannerManagement = () => {
         };
 
         if (isEditing) {
-            await axios.put(`/api/config/banner/${formData.id}`, payload, {
+            await apiClient.put(`/api/config/banner/${formData.id}`, payload, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             toast.success("อัพเดทแบนเนอร์สำเร็จ");
         } else {
-            await axios.post('/api/config/banner', payload, {
+            await apiClient.post('/api/config/banner', payload, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             toast.success("เพิ่มแบนเนอร์สำเร็จ");
@@ -130,7 +130,7 @@ const BannerManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm("คุณต้องการลบแบนเนอร์นี้ใช่หรือไม่?")) {
         try {
-            await axios.delete(`/api/config/banner/${id}`, {
+            await apiClient.delete(`/api/config/banner/${id}`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             toast.success("ลบแบนเนอร์สำเร็จ");
@@ -143,7 +143,7 @@ const BannerManagement = () => {
 
   const toggleStatus = async (id) => {
       try {
-          await axios.patch(`/api/config/banner/${id}/status`, {}, {
+          await apiClient.patch(`/api/config/banner/${id}/status`, {}, {
               headers: { Authorization: `Bearer ${user.token}` }
           });
           loadBanners(); // Reload to get updated status

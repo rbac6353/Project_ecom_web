@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
@@ -26,7 +26,7 @@ const SellerDashboard = () => {
 
   const load = async () => {
     try {
-      const { data } = await axios.get('/api/my/store');
+      const { data } = await apiClient.get('/api/my/store');
       setStore(data.store);
       if (data.store) {
         setForm({
@@ -45,7 +45,7 @@ const SellerDashboard = () => {
   const loadSales = async () => {
     setLoadingSales(true);
     try {
-      const { data } = await axios.get('/api/my/store/sales');
+      const { data } = await apiClient.get('/api/my/store/sales');
       setSalesData(data);
     } catch (e) {
       toast.error(e.response?.data?.message || 'ไม่สามารถโหลดข้อมูลการขายได้');
@@ -71,7 +71,7 @@ const SellerDashboard = () => {
       if (selectedOrderStatus !== 'all') {
         params.append('status', selectedOrderStatus);
       }
-      const response = await axios.get(`/api/my/store/orders?${params}`, {
+      const response = await apiClient.get(`/api/my/store/orders?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrders(response.data.orders || []);
@@ -89,7 +89,7 @@ const SellerDashboard = () => {
       setUpdatingStatus(prev => new Set(prev).add(orderId));
       const token = authStorage.getToken();
 
-      await axios.put(
+      await apiClient.put(
         `/api/my/store/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -169,7 +169,7 @@ const SellerDashboard = () => {
   const saveStore = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('/api/my/store', form);
+      await apiClient.put('/api/my/store', form);
       toast.success('บันทึกข้อมูลร้านค้าสำเร็จ');
       setEditingStore(false);
       load();
@@ -181,7 +181,7 @@ const SellerDashboard = () => {
   const removeProduct = async (id) => {
     if (!window.confirm('ยืนยันลบสินค้า?')) return;
     try {
-      await axios.delete(`/api/seller/product/${id}`);
+      await apiClient.delete(`/api/seller/product/${id}`);
       toast.success('ลบสินค้าสำเร็จ');
       load();
     } catch (e) {

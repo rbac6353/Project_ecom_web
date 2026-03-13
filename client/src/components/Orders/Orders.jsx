@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import apiClient from '../../utils/axiosConfig';
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import { useCart } from "../../context/CartContext";
@@ -56,7 +56,7 @@ const Orders = () => {
   const loadOrders = async (isRefresh = false) => {
     try {
       const token = authStorage.getToken();
-      const response = await axios.get("/api/user/orders", {
+      const response = await apiClient.get("/api/user/orders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.orders) {

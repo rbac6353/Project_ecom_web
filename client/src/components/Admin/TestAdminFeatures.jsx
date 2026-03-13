@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 
 const TestAdminFeatures = () => {
   const [testResults, setTestResults] = useState([]);
@@ -16,7 +16,7 @@ const TestAdminFeatures = () => {
     try {
       // Test 1: Create Category
       try {
-        const categoryResponse = await axios.post('/api/category', {
+        const categoryResponse = await apiClient.post('/api/category', {
           name: `Test Category ${Date.now()}`
         });
         addResult('สร้างหมวดหมู่', true, categoryResponse.data.message);
@@ -26,11 +26,11 @@ const TestAdminFeatures = () => {
 
       // Test 2: Create Product
       try {
-        const categoriesResponse = await axios.get('/api/category');
+        const categoriesResponse = await apiClient.get('/api/category');
         const categoryId = categoriesResponse.data.categories[0]?.id;
         
         if (categoryId) {
-          const productResponse = await axios.post('/api/product', {
+          const productResponse = await apiClient.post('/api/product', {
             title: `Test Product ${Date.now()}`,
             description: 'This is a test product created from admin panel',
             price: 299.99,
@@ -53,7 +53,7 @@ const TestAdminFeatures = () => {
 
       // Test 3: List Users
       try {
-        const usersResponse = await axios.get('/api/users');
+        const usersResponse = await apiClient.get('/api/users');
         addResult('ดูรายชื่อผู้ใช้', true, `พบผู้ใช้ ${usersResponse.data.count} คน`);
       } catch (error) {
         addResult('ดูรายชื่อผู้ใช้', false, error.response?.data?.message);
@@ -62,7 +62,7 @@ const TestAdminFeatures = () => {
       // Test 4: Create Test User
       try {
         const testEmail = `testuser${Date.now()}@example.com`;
-        const registerResponse = await axios.post('/api/register', {
+        const registerResponse = await apiClient.post('/api/register', {
           email: testEmail,
           password: '123456',
           name: 'Test User for Admin'
@@ -71,18 +71,18 @@ const TestAdminFeatures = () => {
 
         // Test 5: Change User Role
         try {
-          const usersResponse = await axios.get('/api/users');
+          const usersResponse = await apiClient.get('/api/users');
           const testUser = usersResponse.data.users.find(u => u.email === testEmail);
           
           if (testUser) {
-            const roleResponse = await axios.post('/api/change-role', {
+            const roleResponse = await apiClient.post('/api/change-role', {
               id: testUser.id,
               role: 'admin'
             });
             addResult('เปลี่ยนสิทธิ์ผู้ใช้', true, roleResponse.data.message);
 
             // Test 6: Delete Test User
-            const deleteResponse = await axios.delete('/api/delete-user', {
+            const deleteResponse = await apiClient.delete('/api/delete-user', {
               data: { id: testUser.id }
             });
             addResult('ลบผู้ใช้', true, deleteResponse.data.message);

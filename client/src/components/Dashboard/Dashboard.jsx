@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import UserDashboard from './UserDashboard';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,14 +29,14 @@ const Dashboard = () => {
       setLoading(true);
       
       // Load user orders
-      const ordersResponse = await axios.get('/api/user/order');
+      const ordersResponse = await apiClient.get('/api/user/order');
       setRecentOrders(ordersResponse.data.orders?.slice(0, 5) || []);
       setStats(prev => ({ ...prev, orders: ordersResponse.data.count || 0 }));
 
       // Load admin stats if admin
       if (isAdmin) {
         try {
-          const usersResponse = await axios.get('/api/users');
+          const usersResponse = await apiClient.get('/api/users');
           setStats(prev => ({ ...prev, users: usersResponse.data.count || 0 }));
         } catch (error) {
           console.error('Error loading admin stats:', error);
@@ -45,7 +45,7 @@ const Dashboard = () => {
 
       // Load products count
       try {
-        const productsResponse = await axios.get('/api/products/100');
+        const productsResponse = await apiClient.get('/api/products/100');
         setStats(prev => ({ ...prev, products: productsResponse.data.products?.length || 0 }));
       } catch (error) {
         console.error('Error loading products:', error);

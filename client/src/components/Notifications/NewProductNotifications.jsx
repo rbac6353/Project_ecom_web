@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 
 const NewProductNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -12,7 +12,7 @@ const NewProductNotifications = () => {
   const loadNotifications = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/notifications/new-products?page=${page}&limit=20`);
+      const response = await apiClient.get(`/api/notifications/new-products?page=${page}&limit=20`);
       setNotifications(response.data.notifications || []);
       setTotalPages(response.data.pagination?.pages || 1);
     } catch (error) {

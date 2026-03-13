@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { authStorage } from '../../utils/authStorage';
@@ -25,7 +25,7 @@ const PaymentCheckout = () => {
   const fetchOrder = useCallback(async () => {
     try {
       const token = authStorage.getToken();
-      const response = await axios.get(`/api/user/orders`, {
+      const response = await apiClient.get(`/api/user/orders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -103,7 +103,7 @@ const PaymentCheckout = () => {
       if (selectedMethod === 'credit_card') method = 'credit_card';
       else if (selectedMethod === 'qr_code') method = 'qr_code';
 
-      const response = await axios.post('/api/payment', {
+      const response = await apiClient.post('/api/payment', {
         orderId: order.id,
         method: method,
         shippingFee: shippingFee,
@@ -424,7 +424,7 @@ const PaymentCheckout = () => {
             onSuccess={async () => {
               try {
                 const token = authStorage.getToken();
-                const { data } = await axios.get(`/api/payment/${payment.id}`, {
+                const { data } = await apiClient.get(`/api/payment/${payment.id}`, {
                   headers: { Authorization: `Bearer ${token}` },
                 });
                 setPayment(data.payment);

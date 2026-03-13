@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import apiClient from '../../utils/axiosConfig';
 import { authStorage } from '../../utils/authStorage';
@@ -30,7 +30,7 @@ const StoreOrderManagement = () => {
         params.append('status', selectedStatus);
       }
 
-      const response = await axios.get(`/api/my/store/orders?${params}`, {
+      const response = await apiClient.get(`/api/my/store/orders?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -48,7 +48,7 @@ const StoreOrderManagement = () => {
       setUpdatingStatus(prev => new Set(prev).add(orderId));
       const token = authStorage.getToken();
 
-      await axios.put(
+      await apiClient.put(
         `/api/my/store/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }

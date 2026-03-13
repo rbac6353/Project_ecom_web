@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import axios from "axios";
+import apiClient from '../../utils/axiosConfig';
 import ProductForm from "../Admin/ProductForm";
 import CategoryManagement from "../Admin/CategoryManagement";
 import LogoutModal from "../Common/LogoutModal";
@@ -78,7 +78,7 @@ const SellerPanel = () => {
   const loadStore = useCallback(async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get("/api/my/store");
+      const { data } = await apiClient.get("/api/my/store");
       setStore(data.store);
       if (data.store) {
         setForm({
@@ -102,7 +102,7 @@ const SellerPanel = () => {
   const loadSales = async () => {
     setLoadingSales(true);
     try {
-      const { data } = await axios.get("/api/my/store/sales");
+      const { data } = await apiClient.get("/api/my/store/sales");
       setSalesData(data);
     } catch (e) {
       toast.error(e.response?.data?.message || "ไม่สามารถโหลดข้อมูลการขายได้");
@@ -116,7 +116,7 @@ const SellerPanel = () => {
   const loadWallet = async () => {
     setLoadingWallet(true);
     try {
-      const { data } = await axios.get("/api/my/store/wallet");
+      const { data } = await apiClient.get("/api/my/store/wallet");
       setWallet(data.wallet || null);
     } catch (e) {
       toast.error(e.response?.data?.message || "ไม่สามารถโหลดกระเป๋าตังได้");
@@ -135,7 +135,7 @@ const SellerPanel = () => {
       if (selectedOrderStatus !== "all") {
         params.append("status", selectedOrderStatus);
       }
-      const response = await axios.get(`/api/my/store/orders?${params}`, {
+      const response = await apiClient.get(`/api/my/store/orders?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setOrders(response.data.orders || []);
@@ -158,7 +158,7 @@ const SellerPanel = () => {
         returnFilter && ["REQUESTED", "APPROVED", "REJECTED"].includes(returnFilter)
           ? `/api/my/store/returns?status=${returnFilter}`
           : "/api/my/store/returns";
-      const { data } = await axios.get(url, {
+      const { data } = await apiClient.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setReturnList(data.orderReturns || []);
@@ -192,7 +192,7 @@ const SellerPanel = () => {
     try {
       setUpdatingStatus((prev) => new Set(prev).add(orderId));
       const token = authStorage.getToken();
-      await axios.put(
+      await apiClient.put(
         `/api/my/store/orders/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } },
@@ -222,7 +222,7 @@ const SellerPanel = () => {
     try {
       setUpdatingStatus((prev) => new Set(prev).add(`logistics-${orderId}`));
       const token = authStorage.getToken();
-      const { data } = await axios.patch(
+      const { data } = await apiClient.patch(
         `/api/orders/${orderId}/status`,
         { status: newOrderStatus },
         { headers: { Authorization: `Bearer ${token}` } },
@@ -255,7 +255,7 @@ const SellerPanel = () => {
   const saveStore = async (e) => {
     e.preventDefault();
     try {
-      await axios.put("/api/my/store", form);
+      await apiClient.put("/api/my/store", form);
       toast.success("บันทึกข้อมูลร้านค้าสำเร็จ");
       loadStore();
     } catch (e) {
@@ -267,7 +267,7 @@ const SellerPanel = () => {
   const removeProduct = async (id) => {
     if (!window.confirm("ยืนยันลบสินค้า?")) return;
     try {
-      await axios.delete(`/api/seller/product/${id}`);
+      await apiClient.delete(`/api/seller/product/${id}`);
       toast.success("ลบสินค้าสำเร็จ");
       loadStore();
     } catch (e) {
@@ -1260,7 +1260,7 @@ const SellerPanel = () => {
                         // Let's uset a simple toast.
                         
                         const token = authStorage.getToken();
-                        const res = await axios.post('/api/images', formData, {
+                        const res = await apiClient.post('/api/images', formData, {
                            headers: { Authorization: `Bearer ${token}` }
                         });
                         
@@ -1351,7 +1351,7 @@ const SellerPanel = () => {
       const token = authStorage.getToken();
       const fd = new FormData();
       for (let i = 0; i < Math.min(files.length, 3); i++) fd.append("proof", files[i]);
-      const res = await axios.post("/api/orders/upload-return-proof", fd, {
+      const res = await apiClient.post("/api/orders/upload-return-proof", fd, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
       const urls = res.data?.urls || (res.data?.proofImageUrl ? [res.data.proofImageUrl] : []);
@@ -1373,7 +1373,7 @@ const SellerPanel = () => {
     setDisputeSubmitting(true);
     try {
       const token = authStorage.getToken();
-      await axios.put(
+      await apiClient.put(
         `/api/orders/${selectedReturnDetail.order.id}/return-dispute`,
         { reason, imageUrls: disputeImageUrls },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -1396,7 +1396,7 @@ const SellerPanel = () => {
     setResolvingReturn(true);
     try {
       const token = authStorage.getToken();
-      await axios.put(
+      await apiClient.put(
         `/api/orders/${orderId}/return-call-rider`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
@@ -1419,7 +1419,7 @@ const SellerPanel = () => {
     setResolvingReturn(true);
     try {
       const token = authStorage.getToken();
-      await axios.put(
+      await apiClient.put(
         `/api/orders/${orderId}/return-approve`,
         { status: "APPROVED" },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -1442,7 +1442,7 @@ const SellerPanel = () => {
     setResolvingReturn(true);
     try {
       const token = authStorage.getToken();
-      await axios.put(
+      await apiClient.put(
         `/api/orders/${orderId}/return-approve`,
         { status: "REJECTED" },
         { headers: { Authorization: `Bearer ${token}` } }

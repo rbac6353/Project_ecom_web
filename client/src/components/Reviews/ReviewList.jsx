@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 
 const ReviewList = ({ productId }) => {
   const [reviews, setReviews] = useState([]);
@@ -11,7 +11,7 @@ const ReviewList = ({ productId }) => {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`/api/review/product/${productId}`);
+        const res = await apiClient.get(`/api/review/product/${productId}`);
         if (!cancelled) {
           setReviews(res.data.reviews || []);
           setSummary(res.data.summary || { count: 0, average: 0 });

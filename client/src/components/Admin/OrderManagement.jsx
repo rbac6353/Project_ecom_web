@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 
@@ -31,7 +31,7 @@ const OrderManagement = () => {
                 params.append('status', filter);
             }
 
-            const response = await axios.get(`/api/admin/orders?${params}`, {
+            const response = await apiClient.get(`/api/admin/orders?${params}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -123,7 +123,7 @@ const OrderManagement = () => {
             setUpdatingStatus(prev => new Set([...prev, orderId]));
             const token = authStorage.getToken();
             
-            await axios.put(`/api/admin/orders/${orderId}/status`, 
+            await apiClient.put(`/api/admin/orders/${orderId}/status`, 
                 { status: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -154,7 +154,7 @@ const OrderManagement = () => {
             setDeletingOrders(prev => new Set([...prev, orderId]));
             const token = authStorage.getToken();
             
-            await axios.delete(`/api/admin/orders/${orderId}`, {
+            await apiClient.delete(`/api/admin/orders/${orderId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

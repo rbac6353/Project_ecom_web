@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
-import axios from "axios";
+import apiClient from '../../utils/axiosConfig';
 import { toast } from "react-toastify";
 import LoginPopup from "../Common/LoginPopup";
 import OutOfStockAlert from "../Common/OutOfStockAlert";
@@ -123,7 +123,7 @@ const UserDashboard = ({ user, stats, loading }) => {
   const loadCategories = async () => {
     try {
       setCategoriesLoading(true);
-      const response = await axios.get("/api/category");
+      const response = await apiClient.get("/api/category");
       console.log("📦 Categories response:", response.data);
       setCategories(response.data.categories || []);
     } catch (error) {
@@ -140,7 +140,7 @@ const UserDashboard = ({ user, stats, loading }) => {
   const loadFeaturedProducts = async () => {
     try {
       setProductsLoading(true);
-      const response = await axios.get("/api/products/100");
+      const response = await apiClient.get("/api/products/100");
       console.log("📦 Featured products response:", response.data);
       const products = response.data.products || [];
       const limitedStock = products
@@ -162,7 +162,7 @@ const UserDashboard = ({ user, stats, loading }) => {
   const loadDiscountProducts = async () => {
     try {
       setDiscountLoading(true);
-      const response = await axios.get("/api/products/100");
+      const response = await apiClient.get("/api/products/100");
       const products = response.data.products || [];
       const onDiscount = products
         .filter((p) => isProductOnDiscount(p) && p.quantity > 0)
@@ -180,7 +180,7 @@ const UserDashboard = ({ user, stats, loading }) => {
     try {
       setAllProductsLoading(true);
       setApiError(null);
-      const response = await axios.get("/api/products/50");
+      const response = await apiClient.get("/api/products/50");
       console.log("📦 All products response:", response.data);
       const products = response.data.products || [];
       // แสดงเฉพาะสินค้าที่มีสต็อก
@@ -200,7 +200,7 @@ const UserDashboard = ({ user, stats, loading }) => {
 
   const loadBanners = async () => {
       try {
-          const { data } = await axios.get('/api/config/banners');
+          const { data } = await apiClient.get('/api/config/banners');
           if (Array.isArray(data) && data.length > 0) {
               setBanners(data);
           }

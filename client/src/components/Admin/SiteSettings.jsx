@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from '../../utils/axiosConfig';
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
@@ -29,7 +29,7 @@ const SiteSettings = () => {
     const loadSettings = async () => {
         try {
             setIsLoading(true);
-            const { data } = await axios.get('/api/config/settings');
+            const { data } = await apiClient.get('/api/config/settings');
             if (data) {
                 setSettings({
                     siteName: data.siteName || "",
@@ -69,7 +69,7 @@ const SiteSettings = () => {
 
         setIsSaving(true);
         try {
-            await axios.post('/api/config/settings', settings, {
+            await apiClient.post('/api/config/settings', settings, {
                 headers: {
                     Authorization: `Bearer ${user.token}`
                 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import LoginPopup from '../Common/LoginPopup';
 import ProductForm from '../Admin/ProductForm';
@@ -166,7 +166,7 @@ const Products = () => {
     try {
       const token = authStorage.getToken();
       const deletePromises = Array.from(selectedProducts).map(productId =>
-        axios.delete(`/api/product/${productId}`, {
+        apiClient.delete(`/api/product/${productId}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       );
@@ -210,7 +210,7 @@ const Products = () => {
   const loadProducts = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/products/50');
+      const response = await apiClient.get('/api/products/50');
       console.log('📦 Products loaded:', response.data.products?.length, 'items');
       if (response.data.products?.[0]) {
         const firstProduct = response.data.products[0];
@@ -242,7 +242,7 @@ const Products = () => {
       const filters = { query };
       if (selectedCategory) filters.category = [parseInt(selectedCategory)];
       if (priceRange[0] > 0 || priceRange[1] < 100000) filters.price = priceRange;
-      const response = await axios.post('/api/search/filters', filters);
+      const response = await apiClient.post('/api/search/filters', filters);
       setProducts(response.data.products || []);
     } catch (error) {
       console.error(error);
@@ -321,7 +321,7 @@ const Products = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('/api/category');
+      const response = await apiClient.get('/api/category');
       setCategories(response.data.categories || []);
     } catch (error) { console.error(error); }
   };
@@ -451,7 +451,7 @@ const Products = () => {
       if (selectedCategory) filters.category = [parseInt(selectedCategory)];
       if (priceRange[0] > 0 || priceRange[1] < 100000) filters.price = priceRange;
       if (Object.keys(filters).length > 0) {
-        const response = await axios.post('/api/search/filters', filters);
+        const response = await apiClient.post('/api/search/filters', filters);
         setProducts(response.data.products || []);
       } else {
         await loadProducts();

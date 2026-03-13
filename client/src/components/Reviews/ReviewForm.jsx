@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 
@@ -16,7 +16,7 @@ const ReviewForm = ({ orderItemId, productTitle, onSubmitted }) => {
     }
     try {
       setLoading(true);
-      await axios.post('/api/review', { orderItemId, rating, comment }, {
+      await apiClient.post('/api/review', { orderItemId, rating, comment }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (onSubmitted) onSubmitted();

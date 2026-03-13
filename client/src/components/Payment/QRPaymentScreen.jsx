@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { authStorage } from '../../utils/authStorage';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'react-toastify';
@@ -61,7 +61,7 @@ const QRPaymentScreen = ({
     if (!orderId) return null;
     try {
       const token = authStorage.getToken();
-      const { data } = await axios.get(`/api/orders/${orderId}`, {
+      const { data } = await apiClient.get(`/api/orders/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return data.order ?? null;

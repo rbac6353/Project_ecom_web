@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 
@@ -18,7 +18,7 @@ const PaymentApproval = () => {
     try {
       setLoading(true);
       const token = authStorage.getToken();
-      const response = await axios.get('/api/notifications/admin/pending', {
+      const response = await apiClient.get('/api/notifications/admin/pending', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPendingPayments(response.data.notifications);
@@ -35,7 +35,7 @@ const PaymentApproval = () => {
       setProcessing(paymentId);
       const token = authStorage.getToken();
 
-      await axios.put(`/api/admin/payment/${paymentId}/approve`, {}, {
+      await apiClient.put(`/api/admin/payment/${paymentId}/approve`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -54,7 +54,7 @@ const PaymentApproval = () => {
       setProcessing(paymentId);
       const token = authStorage.getToken();
 
-      await axios.put(`/api/admin/payment/${paymentId}/reject`, {
+      await apiClient.put(`/api/admin/payment/${paymentId}/reject`, {
         reason: rejectReason || 'ไม่ระบุเหตุผล'
       }, {
         headers: { Authorization: `Bearer ${token}` }

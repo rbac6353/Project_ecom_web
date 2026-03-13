@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import ProductForm from './ProductForm';
 
@@ -25,7 +25,7 @@ const ProductManagement = () => {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/product');
+      const response = await apiClient.get('/api/product');
       setProducts(response.data.products || []);
     } catch (error) {
       console.error('Error loading products:', error);
@@ -37,7 +37,7 @@ const ProductManagement = () => {
 
   const loadCategories = async () => {
     try {
-      const response = await axios.get('/api/category');
+      const response = await apiClient.get('/api/category');
       setCategories(response.data.categories || []);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -77,7 +77,7 @@ const ProductManagement = () => {
     if (!window.confirm(`⚠️ คุณต้องการลบสินค้า "${product.title}" หรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) return;
 
     try {
-      await axios.delete(`/api/product/${product.id}`);
+      await apiClient.delete(`/api/product/${product.id}`);
       toast.success('ลบสินค้าสำเร็จ');
       loadProducts();
     } catch (error) {

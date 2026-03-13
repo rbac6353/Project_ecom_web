@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -28,7 +28,7 @@ const DiscountProducts = () => {
   const loadDiscountProducts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/products/100');
+      const response = await apiClient.get('/api/products/100');
       const allProducts = response.data.products || [];
 
       const discountProducts = allProducts.filter(product =>

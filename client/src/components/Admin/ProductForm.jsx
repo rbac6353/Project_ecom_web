@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 import ProductImageUpload from './ProductImageUpload';
@@ -179,7 +179,7 @@ const ProductForm = ({ editingProduct, onClose, onSuccess, onRefresh, createEndp
   const loadCategories = async () => {
     try {
       setCategoriesLoading(true);
-      const response = await axios.get('/api/category');
+      const response = await apiClient.get('/api/category');
       setCategories(response.data.categories || []);
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -316,10 +316,10 @@ const ProductForm = ({ editingProduct, onClose, onSuccess, onRefresh, createEndp
       };
 
       if (editingProduct) {
-        await axios.put(`${updateEndpointBase}/${editingProduct.id}`, formData, config);
+        await apiClient.put(`${updateEndpointBase}/${editingProduct.id}`, formData, config);
         toast.success('อัพเดตสินค้าสำเร็จ!');
       } else {
-        await axios.post(createEndpoint, formData, config);
+        await apiClient.post(createEndpoint, formData, config);
         toast.success('เพิ่มสินค้าใหม่สำเร็จ!');
       }
 

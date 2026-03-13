@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { useParams, Link } from 'react-router-dom';
 import StoreReviewList from '../Reviews/StoreReviewList';
 
@@ -17,7 +17,7 @@ const StoreDetail = () => {
       try {
         setLoading(true);
         setError(null);
-        const { data } = await axios.get(`/api/store/${id}`);
+        const { data } = await apiClient.get(`/api/store/${id}`);
         if (data && data.store) {
           setStore(data.store);
         } else {

@@ -4,7 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import { authStorage } from '../../utils/authStorage';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import LoginPopup from '../Common/LoginPopup';
 
@@ -113,7 +113,7 @@ const Cart = () => {
       const loadCoupons = async () => {
         try {
           const token = authStorage.getToken();
-          const response = await axios.get('/api/coupon/my-coupons', {
+          const response = await apiClient.get('/api/coupon/my-coupons', {
             headers: { Authorization: `Bearer ${token}` }
           });
           setUserCoupons(response.data.coupons || []);
@@ -146,7 +146,7 @@ const Cart = () => {
     try {
       setValidatingCoupon(true);
       const token = authStorage.getToken();
-      const response = await axios.post('/api/coupon/validate', 
+      const response = await apiClient.post('/api/coupon/validate', 
         { code: code.toUpperCase(), cartTotal: selectedTotal },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -185,7 +185,7 @@ const Cart = () => {
 
     try {
       setCheckoutLoading(true);
-      const response = await axios.post('/api/user/order', {
+      const response = await apiClient.post('/api/user/order', {
         couponId: appliedCoupon?.id,
         discountAmount: discountAmount
       }, {
