@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 
@@ -22,7 +22,7 @@ const CategoryManagement = () => {
     try {
       setLoading(true);
       const token = authStorage.getToken();
-      const response = await axios.get('/api/category', {
+      const response = await apiClient.get('/api/category', {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
       setCategories(response.data.categories || []);
@@ -65,7 +65,7 @@ const CategoryManagement = () => {
       }
 
       if (editingCategory) {
-        await axios.put(`/api/category/${editingCategory.id}`, formDataToSend, {
+        await apiClient.put(`/api/category/${editingCategory.id}`, formDataToSend, {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -73,7 +73,7 @@ const CategoryManagement = () => {
         });
         toast.success('อัพเดตหมวดหมู่สำเร็จ');
       } else {
-        await axios.post('/api/category', formDataToSend, {
+        await apiClient.post('/api/category', formDataToSend, {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
@@ -153,7 +153,7 @@ const CategoryManagement = () => {
     
     try {
       const token = authStorage.getToken();
-      await axios.delete(`/api/category/${category.id}`, { 
+      await apiClient.delete(`/api/category/${category.id}`, { 
         headers: { Authorization: `Bearer ${token}` } 
       });
       toast.success('ลบสำเร็จ');
