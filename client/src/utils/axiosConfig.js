@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { authStorage } from './authStorage';
 
-// โปรเจกต์นี้ใช้ Create React App → ใช้ REACT_APP_ (ถ้าเป็น Vite ต้องใช้ VITE_ และ import.meta.env.VITE_API_URL)
+// โปรเจกต์นี้ใช้ Create React App → ใช้ REACT_APP_API_URL (ตั้งบน Vercel แล้วต้อง Redeploy ถึงจะใช้ค่าใหม่)
 const apiClient = axios.create({
   baseURL: process.env.REACT_APP_API_URL || 'http://localhost:3000',
   withCredentials: true, // ส่ง Cookie/Session ได้

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { authStorage } from '../utils/authStorage';
+import apiClient from '../utils/axiosConfig';
 
 const AuthContext = createContext();
 
@@ -13,31 +13,7 @@ export const useAuth = () => {
   return context;
 };
 
-// Axios interceptor for automatic token attachment (ใช้ sessionStorage แยกตามแท็บ)
-axios.interceptors.request.use(
-  (config) => {
-    const token = authStorage.getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Axios interceptor for handling 401 errors
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      authStorage.clearAuth();
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+// ใช้ apiClient จาก axiosConfig (มี baseURL = REACT_APP_API_URL + interceptors อยู่แล้ว)
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -56,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      const response = await apiClient.post('/api/auth/login', { email, password });
       const { user, token } = response.data;
 
       authStorage.setAuth(token, user);
@@ -73,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (email, password, name, role = 'user', address = '', phone = '') => {
     try {
-      await axios.post('/api/auth/register', {
+      await apiClient.post('/api/auth/register', {
         email,
         password,
         name,
