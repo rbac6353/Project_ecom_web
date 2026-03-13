@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import axios from 'axios';
+import apiClient from '../utils/axiosConfig';
 import LogoutModal from './Common/LogoutModal';
 
 // บัญชีทดสอบ (รหัสผ่าน 12345678) - สำหรับสลับบัญชีเร็ว
@@ -41,7 +41,7 @@ const Navbar = () => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await axios.get('/api/category');
+        const response = await apiClient.get('/api/category');
         setCategories(response.data.categories || []);
       } catch (error) {
         console.error('Error loading categories:', error);
@@ -97,7 +97,7 @@ const Navbar = () => {
         }
 
         // ค้นหาสินค้าที่ตรงกับคำค้นหา
-        const response = await axios.post('/api/search/filters', {
+        const response = await apiClient.post('/api/search/filters', {
           query: query
         });
 

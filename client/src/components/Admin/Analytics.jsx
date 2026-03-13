@@ -13,7 +13,7 @@ import {
   Filler
 } from 'chart.js';
 import { Line, Bar, Doughnut, Pie } from 'react-chartjs-2';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 
 // Register Chart.js components
 ChartJS.register(
@@ -56,7 +56,7 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/admin/analytics?timeRange=${timeRange}`);
+      const response = await apiClient.get(`/api/admin/analytics?timeRange=${timeRange}`);
       
       if (response.data.analytics) {
         const data = response.data.analytics;

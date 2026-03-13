@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../utils/axiosConfig';
 import { useAuth } from './AuthContext';
 import { useNotification } from './NotificationContext';
 import CartSuccessPopup from '../components/Cart/CartSuccessPopup';
@@ -45,7 +45,7 @@ export const CartProvider = ({ children }) => {
     
     try {
       setLoading(true);
-      const response = await axios.get('/api/user/cart');
+      const response = await apiClient.get('/api/user/cart');
       setCart(response.data.cart);
     } catch (error) {
       console.error('Error loading cart:', error);
@@ -66,12 +66,12 @@ export const CartProvider = ({ children }) => {
       const existingItem = cart?.products?.find(p => p.product?.id === parseInt(productId));
       if (existingItem) {
         // Use quantity update endpoint to prevent flicker/duplication
-        response = await axios.put('/api/user/cart/quantity', {
+        response = await apiClient.put('/api/user/cart/quantity', {
           cartItemId: parseInt(existingItem.id),
           newQuantity: parseInt(existingItem.count) + parseInt(count)
         });
       } else {
-        response = await axios.post('/api/user/cart', {
+        response = await apiClient.post('/api/user/cart', {
           productId: parseInt(productId),
           count: parseInt(count),
           price: parseFloat(price)
@@ -124,7 +124,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async () => {
     try {
       setLoading(true);
-      const response = await axios.delete('/api/user/cart');
+      const response = await apiClient.delete('/api/user/cart');
       setCart(response.data.cart);
       showSuccess('ล้างตะกร้าสำเร็จ');
       return { success: true };
@@ -143,7 +143,7 @@ export const CartProvider = ({ children }) => {
   const updateCartItemQuantity = async (cartItemId, newQuantity) => {
     try {
       setLoading(true);
-      const response = await axios.put('/api/user/cart/quantity', {
+      const response = await apiClient.put('/api/user/cart/quantity', {
         cartItemId: parseInt(cartItemId),
         newQuantity: parseInt(newQuantity)
       });
@@ -163,7 +163,7 @@ export const CartProvider = ({ children }) => {
   const removeCartItem = async (cartItemId) => {
     try {
       setLoading(true);
-      const response = await axios.delete('/api/user/cart/item', {
+      const response = await apiClient.delete('/api/user/cart/item', {
         data: { cartItemId: parseInt(cartItemId) }
       });
       
