@@ -24,6 +24,7 @@ const ProductDetail = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showOutOfStockAlert, setShowOutOfStockAlert] = useState(false);
   const [selectedVariants, setSelectedVariants] = useState({});
+  const [preferVariantImage, setPreferVariantImage] = useState(true); // true = แสดงรูปตามตัวเลือกที่เลือก
   const [isFavorite, setIsFavorite] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(Math.floor(Math.random() * 1000) + 100);
 
@@ -305,6 +306,20 @@ const ProductDetail = () => {
     return [];
   }, [product]);
 
+  // รูปของตัวเลือกที่เลือกอยู่ (ถ้าตัวเลือกนั้นมี imageUrl)
+  const selectedVariantImageUrl = useMemo(() => {
+    if (!productVariants.length || !selectedVariants) return null;
+    for (const variant of productVariants) {
+      const selectedName = selectedVariants[variant.name];
+      if (!selectedName) continue;
+      const option = variant.options?.find(opt =>
+        (typeof opt === 'object' ? opt.name : opt) === selectedName
+      );
+      if (typeof option === 'object' && option?.imageUrl) return option.imageUrl;
+    }
+    return null;
+  }, [productVariants, selectedVariants]);
+
   // SKU ตามตัวเลือกที่เลือก (จาก variantDetails) หรือ fallback เป็น product.sku / #id
   const displaySku = useMemo(() => {
     if (!product) return `#${product?.id || ''}`;
@@ -413,9 +428,9 @@ const ProductDetail = () => {
     );
   }
 
-  const mainImage = product.images && product.images.length > 0
-    ? product.images[currentImageIndex]
-    : null;
+  const mainImage = (preferVariantImage && selectedVariantImageUrl)
+    ? { url: selectedVariantImageUrl }
+    : (product.images && product.images.length > 0 ? product.images[currentImageIndex] : null);
 
   const onDiscount = isProductOnDiscount(product);
   const discountPercent = onDiscount ? getDiscountPercentage(product) : 0;
@@ -477,21 +492,23 @@ const ProductDetail = () => {
                 {product.images && product.images.length > 1 && (
                   <>
                     <button
-                      onClick={() => setCurrentImageIndex(prev => prev === 0 ? product.images.length - 1 : prev - 1)}
+                      onClick={() => { setPreferVariantImage(false); setCurrentImageIndex(prev => prev === 0 ? product.images.length - 1 : prev - 1); }}
                       className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white text-gray-700 hover:text-[#ee4d2d] rounded-full flex items-center justify-center transition-all shadow-md hover:shadow-lg border border-gray-200"
                     >
                       <i className="fas fa-chevron-left text-sm"></i>
                     </button>
                     <button
-                      onClick={() => setCurrentImageIndex(prev => prev === product.images.length - 1 ? 0 : prev + 1)}
+                      onClick={() => { setPreferVariantImage(false); setCurrentImageIndex(prev => prev === product.images.length - 1 ? 0 : prev + 1); }}
                       className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/90 hover:bg-white text-gray-700 hover:text-[#ee4d2d] rounded-full flex items-center justify-center transition-all shadow-md hover:shadow-lg border border-gray-200"
                     >
                       <i className="fas fa-chevron-right text-sm"></i>
                     </button>
-                    {/* Image Counter */}
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/50 text-white text-xs rounded-full">
-                      {currentImageIndex + 1} / {product.images.length}
-                    </div>
+                    {/* Image Counter - ซ่อนเมื่อแสดงรูปตามตัวเลือก */}
+                    {!(preferVariantImage && selectedVariantImageUrl) && (
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/50 text-white text-xs rounded-full">
+                        {currentImageIndex + 1} / {product.images.length}
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -502,8 +519,8 @@ const ProductDetail = () => {
                   {product.images.map((image, index) => (
                     <button
                       key={index}
-                      onClick={() => setCurrentImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-sm overflow-hidden transition-all ${currentImageIndex === index
+                      onClick={() => { setPreferVariantImage(false); setCurrentImageIndex(index); }}
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 border-2 rounded-sm overflow-hidden transition-all ${!preferVariantImage && currentImageIndex === index
                           ? 'border-[#ee4d2d]'
                           : 'border-gray-200 hover:border-gray-400'
                         }`}
@@ -674,7 +691,7 @@ const ProductDetail = () => {
                           return (
                             <button
                               key={optIndex}
-                              onClick={() => setSelectedVariants(prev => ({ ...prev, [variant.name]: optionName }))}
+                              onClick={() => { setSelectedVariants(prev => ({ ...prev, [variant.name]: optionName })); setPreferVariantImage(true); }}
                               className={`px-4 py-2 rounded-sm border text-sm transition-all flex flex-col items-center ${isSelected
                                   ? 'border-[#ee4d2d] text-[#ee4d2d] bg-[#fff0ed]'
                                   : 'border-gray-300 text-gray-700 hover:border-[#ee4d2d] hover:text-[#ee4d2d]'
