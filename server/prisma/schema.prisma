@@ -92,7 +92,7 @@ model WalletTransaction {
 
 model Product {
   id                Int              @id @default(autoincrement())
-  // sku อยู่ใน product_variant; ถ้า product.sku มีใน DB ให้เพิ่มกลับ: sku String? @unique
+  sku               String?          @unique // รองรับ product.sku ใน DB (TiDB)
   title             String
   description       String?  @db.Text
   price             Float
