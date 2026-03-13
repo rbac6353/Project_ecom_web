@@ -33,7 +33,7 @@ const QRPaymentScreen = ({
     if (!payment?.id || payment.status === 'completed') return;
     let cancelled = false;
     const token = authStorage.getToken();
-    axios
+    apiClient
       .get(`/api/payment/${payment.id}/promptpay`, { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => {
         const qr = res.data?.promptPay?.qrString || res.data?.qrString;

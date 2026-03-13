@@ -13,7 +13,6 @@ import {
 import ReviewForm from "../Reviews/ReviewForm";
 import TrackingTimeline from "./TrackingTimeline";
 import ReturnRequestModal from "./ReturnRequestModal";
-import apiClient from "../../utils/axiosConfig";
 import { authStorage } from "../../utils/authStorage";
 
 const Orders = () => {
