@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
 
@@ -31,7 +31,7 @@ const StoreApproval = () => {
         endpoint = '/api/admin/stores?status=suspended';
       }
         
-      const { data } = await axios.get(endpoint, {
+      const { data } = await apiClient.get(endpoint, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStores(data.stores);
@@ -56,7 +56,7 @@ const StoreApproval = () => {
       setActionLoading(true);
       const token = authStorage.getToken();
       
-      await axios.put(`/api/admin/store/${storeId}/status`, { status: newStatus }, {
+      await apiClient.put(`/api/admin/store/${storeId}/status`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -77,7 +77,7 @@ const StoreApproval = () => {
     try {
       setActionLoading(true);
       const token = authStorage.getToken();
-      await axios.delete(`/api/admin/store/${storeId}`, {
+      await apiClient.delete(`/api/admin/store/${storeId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -96,7 +96,7 @@ const StoreApproval = () => {
     try {
       setActionLoading(true);
       const token = authStorage.getToken();
-      await axios.put(`/api/admin/store/${selectedStore.id}`, editFormData, {
+      await apiClient.put(`/api/admin/store/${selectedStore.id}`, editFormData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('แก้ไขข้อมูลร้านค้าเรียบร้อยแล้ว');
