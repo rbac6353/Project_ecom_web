@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 
 const UserManagement = () => {
@@ -14,7 +14,7 @@ const UserManagement = () => {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/api/users');
+      const response = await apiClient.get('/api/users');
       setUsers(response.data.users || []);
     } catch (error) {
       console.error('Error loading users:', error);
@@ -26,7 +26,7 @@ const UserManagement = () => {
 
   const handleChangeUserStatus = async (userId, currentStatus) => {
     try {
-      await axios.post('/api/change-status', {
+      await apiClient.post('/api/change-status', {
         id: userId,
         enabled: !currentStatus
       });
@@ -41,7 +41,7 @@ const UserManagement = () => {
     if (!window.confirm(`คุณต้องการเปลี่ยนสิทธิ์เป็น ${newRole} หรือไม่?`)) return;
 
     try {
-      await axios.post('/api/change-role', {
+      await apiClient.post('/api/change-role', {
         id: userId,
         role: newRole
       });
@@ -56,7 +56,7 @@ const UserManagement = () => {
     if (!window.confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบผู้ใช้ "${userName}"?\nข้อมูลทั้งหมดจะถูกลบและไม่สามารถกู้คืนได้!`)) return;
 
     try {
-      await axios.delete('/api/delete-user', { data: { id: userId } });
+      await apiClient.delete('/api/delete-user', { data: { id: userId } });
       toast.success('ลบผู้ใช้สำเร็จ');
       loadUsers();
     } catch (error) {
