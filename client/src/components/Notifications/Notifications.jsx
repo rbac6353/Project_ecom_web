@@ -7,6 +7,8 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [markingId, setMarkingId] = useState(null);
+  const [markAllLoading, setMarkAllLoading] = useState(false);
 
   useEffect(() => {
     loadNotifications();
@@ -32,6 +34,7 @@ const Notifications = () => {
 
   const markAsRead = async (notificationId) => {
     try {
+      setMarkingId(notificationId);
       const token = authStorage.getToken();
       await apiClient.put(`/api/notifications/${notificationId}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
@@ -44,11 +47,14 @@ const Notifications = () => {
       setUnreadCount(Math.max(0, unreadCount - 1));
     } catch (error) {
       console.error('Error marking as read:', error);
+    } finally {
+      setMarkingId(null);
     }
   };
 
   const markAllAsRead = async () => {
     try {
+      setMarkAllLoading(true);
       const token = authStorage.getToken();
       await apiClient.put('/api/notifications/read-all', {}, {
         headers: { Authorization: `Bearer ${token}` }
@@ -60,6 +66,8 @@ const Notifications = () => {
     } catch (error) {
       console.error('Error marking all as read:', error);
       toast.error('เกิดข้อผิดพลาด');
+    } finally {
+      setMarkAllLoading(false);
     }
   };
 
@@ -117,10 +125,11 @@ const Notifications = () => {
         <div className="mb-6 flex justify-end">
           <button
             onClick={markAllAsRead}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+            disabled={markAllLoading}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <i className="fas fa-check-double mr-2"></i>
-            ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว
+            {markAllLoading ? <i className="fas fa-spinner fa-spin mr-2"></i> : <i className="fas fa-check-double mr-2"></i>}
+            {markAllLoading ? 'กำลังประมวลผล...' : 'ทำเครื่องหมายทั้งหมดว่าอ่านแล้ว'}
           </button>
         </div>
       )}
@@ -140,8 +149,8 @@ const Notifications = () => {
             return (
               <div
                 key={notification.id}
-                onClick={() => !notification.isRead && markAsRead(notification.id)}
-                className={`bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden cursor-pointer transition-all hover:shadow-xl ${!notification.isRead ? 'border-l-4 border-l-blue-500' : ''
+                onClick={() => !notification.isRead && markingId !== notification.id && markAsRead(notification.id)}
+                className={`bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transition-all hover:shadow-xl ${markingId === notification.id ? 'opacity-70 cursor-wait' : 'cursor-pointer'} ${!notification.isRead ? 'border-l-4 border-l-blue-500' : ''
                   }`}
               >
                 <div className="p-6">

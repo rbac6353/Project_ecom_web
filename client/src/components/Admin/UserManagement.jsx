@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -26,6 +27,7 @@ const UserManagement = () => {
 
   const handleChangeUserStatus = async (userId, currentStatus) => {
     try {
+      setActionLoadingId(userId);
       await apiClient.post('/api/change-status', {
         id: userId,
         enabled: !currentStatus
@@ -34,6 +36,8 @@ const UserManagement = () => {
       loadUsers();
     } catch (error) {
       toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -41,6 +45,7 @@ const UserManagement = () => {
     if (!window.confirm(`คุณต้องการเปลี่ยนสิทธิ์เป็น ${newRole} หรือไม่?`)) return;
 
     try {
+      setActionLoadingId(userId);
       await apiClient.post('/api/change-role', {
         id: userId,
         role: newRole
@@ -49,6 +54,8 @@ const UserManagement = () => {
       loadUsers();
     } catch (error) {
       toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -56,11 +63,14 @@ const UserManagement = () => {
     if (!window.confirm(`⚠️ คุณแน่ใจหรือไม่ที่จะลบผู้ใช้ "${userName}"?\nข้อมูลทั้งหมดจะถูกลบและไม่สามารถกู้คืนได้!`)) return;
 
     try {
+      setActionLoadingId(userId);
       await apiClient.delete('/api/delete-user', { data: { id: userId } });
       toast.success('ลบผู้ใช้สำเร็จ');
       loadUsers();
     } catch (error) {
       toast.error(error.response?.data?.message || 'เกิดข้อผิดพลาด');
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -179,7 +189,8 @@ const UserManagement = () => {
                     <select
                       value={user.role}
                       onChange={(e) => handleChangeUserRole(user.id, e.target.value)}
-                      className={`text-xs font-semibold px-2.5 py-1 rounded-lg border appearance-none cursor-pointer focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 outline-none transition-all ${getRoleBadgeColor(user.role)}`}
+                      disabled={actionLoadingId === user.id}
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-lg border appearance-none focus:ring-2 focus:ring-offset-1 focus:ring-indigo-500 outline-none transition-all disabled:opacity-60 disabled:cursor-not-allowed ${getRoleBadgeColor(user.role)}`}
                     >
                       <option value="user">User</option>
                       <option value="courier">Courier (ไรเดอร์)</option>
@@ -190,7 +201,8 @@ const UserManagement = () => {
                   <td className="p-4 text-center">
                     <button
                       onClick={() => handleChangeUserStatus(user.id, user.enabled)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
+                      disabled={actionLoadingId === user.id}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed ${
                         user.enabled ? 'bg-emerald-500' : 'bg-slate-300'
                       }`}
                     >
@@ -211,10 +223,11 @@ const UserManagement = () => {
                   <td className="p-4 text-center">
                     <button
                       onClick={() => handleDeleteUser(user.id, user.username)}
-                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                      disabled={actionLoadingId === user.id}
+                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
                       title="ลบผู้ใช้"
                     >
-                      <i className="fas fa-trash-alt"></i>
+                      {actionLoadingId === user.id ? <i className="fas fa-spinner fa-spin text-xs"></i> : <i className="fas fa-trash-alt"></i>}
                     </button>
                   </td>
                 </tr>

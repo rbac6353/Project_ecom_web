@@ -65,6 +65,7 @@ const Products = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [sortBy, setSortBy] = useState('name-asc');
   const [selectedProducts, setSelectedProducts] = useState(new Set()); // Selected product IDs
+  const [isDeletingSelected, setIsDeletingSelected] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [servicesFilters, setServicesFilters] = useState({
@@ -164,6 +165,7 @@ const Products = () => {
     }
 
     try {
+      setIsDeletingSelected(true);
       const token = authStorage.getToken();
       const deletePromises = Array.from(selectedProducts).map(productId =>
         apiClient.delete(`/api/product/${productId}`, {
@@ -178,6 +180,8 @@ const Products = () => {
     } catch (error) {
       console.error('Error deleting products:', error);
       toast.error('เกิดข้อผิดพลาดในการลบสินค้า');
+    } finally {
+      setIsDeletingSelected(false);
     }
   };
 
@@ -568,10 +572,11 @@ const Products = () => {
                   </span>
                   <button
                     onClick={handleDeleteSelected}
-                    className="px-4 py-2 bg-red-500 text-white rounded-sm hover:bg-red-600 transition-colors text-sm flex items-center gap-2"
+                    disabled={isDeletingSelected}
+                    className="px-4 py-2 bg-red-500 text-white rounded-sm hover:bg-red-600 transition-colors text-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <i className="fas fa-trash"></i>
-                    <span>ลบที่เลือก</span>
+                    {isDeletingSelected ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-trash"></i>}
+                    <span>{isDeletingSelected ? 'กำลังลบ...' : 'ลบที่เลือก'}</span>
                   </button>
                 </>
               )}

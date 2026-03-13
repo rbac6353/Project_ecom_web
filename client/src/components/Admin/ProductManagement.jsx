@@ -9,6 +9,7 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   
   // Pagination & Filter state
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,12 +78,15 @@ const ProductManagement = () => {
     if (!window.confirm(`⚠️ คุณต้องการลบสินค้า "${product.title}" หรือไม่?\nการกระทำนี้ไม่สามารถย้อนกลับได้`)) return;
 
     try {
+      setDeletingId(product.id);
       await apiClient.delete(`/api/product/${product.id}`);
       toast.success('ลบสินค้าสำเร็จ');
       loadProducts();
     } catch (error) {
       console.error('Error:', error);
       toast.error('เกิดข้อผิดพลาดในการลบสินค้า');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -277,10 +281,11 @@ const ProductManagement = () => {
                         </button>
                         <button
                           onClick={() => handleDelete(product)}
-                          className="w-7 h-7 flex items-center justify-center rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                          disabled={deletingId === product.id}
+                          className="w-7 h-7 flex items-center justify-center rounded bg-red-50 text-red-600 hover:bg-red-100 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                           title="ลบ"
                         >
-                          <i className="fas fa-trash text-xs"></i>
+                          {deletingId === product.id ? <i className="fas fa-spinner fa-spin text-xs"></i> : <i className="fas fa-trash text-xs"></i>}
                         </button>
                       </div>
                     </td>

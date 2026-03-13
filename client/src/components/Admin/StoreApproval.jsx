@@ -418,9 +418,10 @@ const StoreApproval = () => {
                     {!isEditing && (
                         <button 
                             onClick={() => handleDelete(selectedStore.id)}
-                            className="text-rose-500 hover:text-rose-700 text-sm font-medium transition-colors"
+                            disabled={actionLoading}
+                            className="text-rose-500 hover:text-rose-700 text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            <i className="fas fa-trash-alt mr-1"></i> ลบร้านค้า
+                            <i className="fas fa-trash-alt mr-1"></i> {actionLoading ? 'กำลังประมวลผล...' : 'ลบร้านค้า'}
                         </button>
                     )}
                  </div>
@@ -429,26 +430,26 @@ const StoreApproval = () => {
                      {isEditing ? (
                          <>
                             <button onClick={() => setIsEditing(false)} className="px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800">ยกเลิก</button>
-                            <button onClick={handleUpdateStore} disabled={actionLoading} className="px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 shadow-sm transition-all">
-                                {actionLoading ? 'บันทึก...' : 'บันทึกการแก้ไข'}
+                            <button onClick={handleUpdateStore} disabled={actionLoading} className="px-4 py-2 bg-orange-600 text-white text-sm font-semibold rounded-lg hover:bg-orange-700 shadow-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                                {actionLoading ? 'กำลังบันทึก...' : 'บันทึกการแก้ไข'}
                             </button>
                          </>
                      ) : (
                          <>
                             {selectedStore.status === 'pending' && (
                                 <>
-                                    <button onClick={() => updateStoreStatus(selectedStore.id, 'rejected')} disabled={actionLoading} className="px-4 py-2 border border-rose-200 text-rose-600 rounded-lg hover:bg-rose-50 text-sm font-semibold">ปฏิเสธ</button>
-                                    <button onClick={() => updateStoreStatus(selectedStore.id, 'approved')} disabled={actionLoading} className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-semibold shadow-md shadow-emerald-200">อนุมัติร้านค้า</button>
+                                    <button onClick={() => updateStoreStatus(selectedStore.id, 'rejected')} disabled={actionLoading} className="px-4 py-2 border border-rose-200 text-rose-600 rounded-lg hover:bg-rose-50 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed">{actionLoading ? 'กำลังประมวลผล...' : 'ปฏิเสธ'}</button>
+                                    <button onClick={() => updateStoreStatus(selectedStore.id, 'approved')} disabled={actionLoading} className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-semibold shadow-md shadow-emerald-200 disabled:opacity-60 disabled:cursor-not-allowed">{actionLoading ? 'กำลังประมวลผล...' : 'อนุมัติร้านค้า'}</button>
                                 </>
                             )}
                             {selectedStore.status === 'approved' && (
-                                <button onClick={() => updateStoreStatus(selectedStore.id, 'suspended')} disabled={actionLoading} className="px-4 py-2 border border-amber-200 text-amber-700 rounded-lg hover:bg-amber-50 text-sm font-semibold">
-                                    <i className="fas fa-ban mr-1"></i> ระงับการใช้งาน
+                                <button onClick={() => updateStoreStatus(selectedStore.id, 'suspended')} disabled={actionLoading} className="px-4 py-2 border border-amber-200 text-amber-700 rounded-lg hover:bg-amber-50 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <i className="fas fa-ban mr-1"></i> {actionLoading ? 'กำลังประมวลผล...' : 'ระงับการใช้งาน'}
                                 </button>
                             )}
                             {(selectedStore.status === 'suspended' || selectedStore.status === 'rejected') && (
-                                <button onClick={() => updateStoreStatus(selectedStore.id, 'approved')} disabled={actionLoading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-semibold">
-                                    <i className="fas fa-undo mr-1"></i> คืนสถานะ
+                                <button onClick={() => updateStoreStatus(selectedStore.id, 'approved')} disabled={actionLoading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
+                                    <i className="fas fa-undo mr-1"></i> {actionLoading ? 'กำลังประมวลผล...' : 'คืนสถานะ'}
                                 </button>
                             )}
                             

@@ -13,6 +13,7 @@ const CategoryManagement = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     loadCategories();
@@ -152,6 +153,7 @@ const CategoryManagement = () => {
     if (!window.confirm(`คุณแน่ใจหรือไม่ที่จะลบหมวดหมู่ "${category.name}"?`)) return;
     
     try {
+      setDeletingId(category.id);
       const token = authStorage.getToken();
       await apiClient.delete(`/api/category/${category.id}`, { 
         headers: { Authorization: `Bearer ${token}` } 
@@ -162,6 +164,8 @@ const CategoryManagement = () => {
       console.error(e);
       const message = e.response?.data?.message || 'ลบไม่สำเร็จ';
       toast.error(message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -235,10 +239,11 @@ const CategoryManagement = () => {
                   </button>
                   <button
                     onClick={() => handleDelete(category)}
-                    className="flex-1 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-sm"
+                    disabled={deletingId === category.id}
+                    className="flex-1 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    <i className="fas fa-trash"></i>
-                    ลบ
+                    {deletingId === category.id ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-trash"></i>}
+                    {deletingId === category.id ? 'กำลังลบ...' : 'ลบ'}
                   </button>
                 </div>
               </div>

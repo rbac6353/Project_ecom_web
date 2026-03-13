@@ -201,6 +201,7 @@ const Cart = () => {
       }
     } catch (error) {
       showError(error.response?.data?.message || 'เกิดข้อผิดพลาดในการสั่งซื้อ', { position: 'bottom-right' });
+    } finally {
       setCheckoutLoading(false);
     }
   };
