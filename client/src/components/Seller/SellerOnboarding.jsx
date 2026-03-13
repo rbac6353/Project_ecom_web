@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import apiClient from '../../utils/axiosConfig';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,7 @@ const SellerOnboarding = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await axios.get('/api/my/store');
+        const { data } = await apiClient.get('/api/my/store');
         if (data.store) {
           if (data.store.status === 'approved') {
             navigate('/seller/dashboard');
@@ -73,7 +73,7 @@ const SellerOnboarding = () => {
     
     try {
       setLoading(true);
-      const { data } = await axios.post('/api/store', form);
+      const { data } = await apiClient.post('/api/store', form);
       toast.success(data.message);
       setStoreStatus('pending');
     } catch (err) {
