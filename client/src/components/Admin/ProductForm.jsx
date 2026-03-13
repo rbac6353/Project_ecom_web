@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import apiClient from '../../utils/axiosConfig';
 import { toast } from 'react-toastify';
 import { authStorage } from '../../utils/authStorage';
@@ -26,6 +26,13 @@ const ProductForm = ({ editingProduct, onClose, onSuccess, onRefresh, createEndp
     variants: []
   });
   const [availableSubcategories, setAvailableSubcategories] = useState([]);
+  const [pickImageForOption, setPickImageForOption] = useState(null); // { variantIndex, optionIndex }
+
+  // รายการรูปสินค้าปัจจุบัน สำหรับให้ตัวเลือกเลือกภาพ (รูปเดิม + รูปที่เพิ่มจาก URL)
+  const currentImageList = useMemo(() => {
+    const existing = (editingProduct?.images || []).map(i => i.url || i.imageUrl).filter(Boolean);
+    return [...existing, ...(imageUrls || [])];
+  }, [editingProduct?.images, imageUrls]);
 
   useEffect(() => {
     loadCategories();
@@ -603,7 +610,7 @@ const ProductForm = ({ editingProduct, onClose, onSuccess, onRefresh, createEndp
                           const priceEl = document.getElementById(`opt-price-${index}`);
                           if (nameEl.value.trim()) {
                             const newVariants = [...productForm.variants];
-                            newVariants[index].options.push({ name: nameEl.value, price: Number(priceEl.value) || 0 });
+                            newVariants[index].options.push({ name: nameEl.value, price: Number(priceEl.value) || 0, imageUrl: undefined });
                             setProductForm(prev => ({ ...prev, variants: newVariants }));
                             nameEl.value = ''; priceEl.value = '';
                           }
@@ -616,11 +623,22 @@ const ProductForm = ({ editingProduct, onClose, onSuccess, onRefresh, createEndp
 
                     <div className="mt-3 flex flex-wrap gap-2">
                       {variant.options.map((opt, optIdx) => (
-                        <div key={optIdx} className="flex items-center gap-1 px-2 py-1 bg-white border border-gray-200 rounded text-sm">
+                        <div key={optIdx} className="flex items-center gap-1.5 px-2 py-1.5 bg-white border border-gray-200 rounded-lg text-sm">
+                          {typeof opt === 'object' && opt.imageUrl && (
+                            <img src={opt.imageUrl} alt={opt.name} className="w-8 h-8 object-cover rounded border border-gray-200" />
+                          )}
                           <span>{opt.name || opt}</span>
                           {typeof opt === 'object' && opt.price > 0 && (
                             <span className="text-orange-600 text-xs">+฿{opt.price}</span>
                           )}
+                          <button
+                            type="button"
+                            onClick={() => setPickImageForOption({ variantIndex: index, optionIndex: optIdx })}
+                            className="text-gray-500 hover:text-orange-600 p-1 rounded hover:bg-orange-50"
+                            title="เลือกรูปสำหรับตัวเลือกนี้"
+                          >
+                            <i className="fas fa-image text-xs"></i>
+                          </button>
                           <button
                             type="button"
                             onClick={() => {
@@ -628,13 +646,51 @@ const ProductForm = ({ editingProduct, onClose, onSuccess, onRefresh, createEndp
                               newVariants[index].options = newVariants[index].options.filter((_, i) => i !== optIdx);
                               setProductForm(prev => ({ ...prev, variants: newVariants }));
                             }}
-                            className="text-gray-400 hover:text-red-500 ml-1"
+                            className="text-gray-400 hover:text-red-500 ml-0.5"
                           >
                             <i className="fas fa-times text-xs"></i>
                           </button>
                         </div>
                       ))}
                     </div>
+
+                    {/* ป๊อปอัปเลือกรูปสำหรับตัวเลือก (เมื่อกดไอคอนรูป) */}
+                    {pickImageForOption?.variantIndex === index && (
+                      <div className="mt-2 p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <p className="text-xs text-gray-600 mb-2">เลือกรูปจากรูปสินค้าด้านบน (กรุณาอัพโหลดหรือใส่ URL รูปก่อน)</p>
+                        {currentImageList.length === 0 ? (
+                          <p className="text-gray-400 text-sm">ยังไม่มีรูปสินค้า — เพิ่มรูปด้านบนก่อน</p>
+                        ) : (
+                          <div className="flex flex-wrap gap-2">
+                            {currentImageList.map((url, imgIdx) => (
+                              <button
+                                key={imgIdx}
+                                type="button"
+                                onClick={() => {
+                                  const newVariants = [...productForm.variants];
+                                  const optIdx = pickImageForOption.optionIndex;
+                                  if (newVariants[index].options[optIdx]) {
+                                    newVariants[index].options[optIdx] = { ...newVariants[index].options[optIdx], imageUrl: url };
+                                    setProductForm(prev => ({ ...prev, variants: newVariants }));
+                                  }
+                                  setPickImageForOption(null);
+                                }}
+                                className="w-14 h-14 rounded border-2 border-gray-200 hover:border-orange-500 overflow-hidden flex-shrink-0"
+                              >
+                                <img src={url} alt="" className="w-full h-full object-cover" />
+                              </button>
+                            ))}
+                            <button
+                              type="button"
+                              onClick={() => setPickImageForOption(null)}
+                              className="text-gray-500 text-sm self-center"
+                            >
+                              ปิด
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
